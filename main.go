@@ -15,6 +15,12 @@ import (
 
 const defaultTitle = ""
 
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
 func main() {
 	var page, toc, xhtml, latex, smartypants, latexdashes, fractions bool
 	var css, cpuprofile string
@@ -129,10 +135,16 @@ func main() {
 		if toc {
 			htmlFlags |= html.TOC
 		}
+		var head string
+		if css != "" {
+			css_content, err := ioutil.ReadFile(css)
+			check(err)
+			head += "<style>" + string(css_content) + "</style>\n"
+		}
 		params := html.RendererOptions{
 			Flags: htmlFlags,
 			Title: title,
-			CSS:   css,
+			Head: []byte(head),
 		}
 		renderer = html.NewRenderer(params)
 	}
